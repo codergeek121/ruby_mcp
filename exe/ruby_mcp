@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "ruby_mcp"
+
+server = RubyMCP::Server.new
+
+if server_impl = ARGV[0]
+  server.instance_eval(File.read(server_impl))
+else
+  RubyMCP.logger.info("No implementation given, starting default server")
+end
+
+transport = RubyMCP::Transport::Stdio.new
+server.connect(transport)
