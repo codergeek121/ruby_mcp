@@ -1,6 +1,7 @@
 module RubyMCP
   class Server
     include Capabilities::Logging
+    include Capabilities::Resources
 
     attr_reader :lifecycle, :prompts, :resources
 

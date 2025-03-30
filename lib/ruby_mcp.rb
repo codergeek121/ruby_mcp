@@ -2,6 +2,7 @@ require "json"
 require "securerandom"
 require "logger"
 require "zeitwerk"
+require "addressable"
 
 loader = Zeitwerk::Loader.for_gem
 loader.inflector.inflect("ruby_mcp" => "RubyMCP")

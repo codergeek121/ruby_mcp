@@ -21,6 +21,8 @@ module RubyMCP
         ResourcesRead
       when "logging/setLevel"
         LoggingSetLevel
+      when "resources/templates/list"
+        ResourcesTemplatesList
       else
         Request
       end.new(parsed)

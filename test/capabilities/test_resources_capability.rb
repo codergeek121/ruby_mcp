@@ -122,4 +122,92 @@ class TestResourcesCapability < ServerTest
       }
     )
   end
+
+  def test_read_template
+    @server.add_resource_template(
+      uri_template: "https://{host}.de",
+      name: "german_website",
+      description: "Every german website",
+      mime_type: "text/html",
+      reader: ->(resource) {
+        "The first demo content of #{resource.name}"
+      }
+    )
+
+    @transport.client_message(
+      jsonrpc: "2.0",
+      id: 1,
+      method: "resources/read",
+      params: {
+        uri: "https://example.de"
+      }
+    )
+
+    @transport.process_message
+
+    assert_last_response(
+      jsonrpc: "2.0",
+      id: 1,
+      result: {
+        contents: [
+          {
+            uri: "https://example.de",
+            mimeType: "text/html",
+            text: "The first demo content of german_website"
+          }
+        ]
+      }
+    )
+  end
+
+  def test_list_templates
+    @server.add_resource_template(
+      uri_template: "https://{host}.de",
+      name: "german_website",
+      description: "Every german website",
+      mime_type: "text/html",
+      reader: ->(resource) {
+        "The first demo content of #{resource.name}"
+      }
+    )
+
+    @server.add_resource_template(
+      uri_template: "https://{host}.com",
+      name: "com_website",
+      description: "Every com website",
+      mime_type: "text/html",
+      reader: ->(resource) {
+        "The first demo content of #{resource.name}"
+      }
+    )
+
+    @transport.client_message(
+      jsonrpc: "2.0",
+      id: 1,
+      method: "resources/templates/list",
+    )
+
+    @transport.process_message
+
+    assert_last_response(
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "resourceTemplates": [
+          {
+            uriTemplate: "https://{host}.de",
+            name: "german_website",
+            description: "Every german website",
+            mimeType: "text/html"
+          },
+          {
+            uriTemplate: "https://{host}.com",
+            name: "com_website",
+            description: "Every com website",
+            mimeType: "text/html"
+          }
+        ]
+      }
+    )
+  end
 end

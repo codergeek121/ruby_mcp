@@ -1,12 +1,15 @@
 class RubyMCP::Handlers::ResourcesRead
   def handle(server, request)
-    if resource = server.resources.find(request.uri)
+    resources = server.resources.find(request.uri)
+    if resources.any?
       server.answer(request,
-        contents: [ {
-          uri: resource.uri,
-          mimeType: resource.mime_type,
-          text: resource.reader.call(resource)
-        } ]
+        contents: resources.map do |resource|
+          {
+            uri: request.uri,
+            mimeType: resource.mime_type,
+            text: resource.reader.call(resource)
+          }
+        end
       )
     else
       server.error(
