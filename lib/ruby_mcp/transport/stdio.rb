@@ -1,8 +1,13 @@
 module RubyMCP
   class Transport
     class Stdio < Transport
+      def initialize
+        @queue = Queue.new
+      end
+
       def start
         @running = true
+        start_message_worker
 
         while @running
           begin
@@ -10,7 +15,7 @@ module RubyMCP
 
             break if line.nil?
 
-            @on_message.call(line.strip)
+            @queue << [ :incoming, line.strip ]
           rescue StandardError => e
             RubyMCP.logger.error("Exception: #{e}")
           end
@@ -19,14 +24,32 @@ module RubyMCP
         @on_close.call
       end
 
-      def send(message)
-        $stdout.puts(JSON.generate(message))
-        $stdout.flush
+      def enqueue(message)
+        @queue << [ :outgoing, JSON.generate(message) ]
       end
 
 
       def on_close(&block)
         @on_close = block
+      end
+
+      private
+
+      def start_message_worker
+        sleep 0.2
+        RubyMCP.logger.info("Starting worker thread")
+        @worker = Thread.new do
+          while @running
+            type, message = @queue.pop
+
+            if type == :incoming
+              @on_message.call(message)
+            else
+              $stdout.puts(message)
+              $stdout.flush
+            end
+          end
+        end
       end
     end
   end

@@ -11,7 +11,7 @@ class RubyMCP::Transport::Test < RubyMCP::Transport
     @running = true
   end
 
-  def send(message)
+  def enqueue(message)
     @responses << JSON.generate(message)
   end
 
