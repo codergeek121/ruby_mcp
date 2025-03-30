@@ -34,6 +34,10 @@ module RubyMCP
       end
     end
 
+    def templates
+      @resource_templates
+    end
+
     private
 
     def find_in_templates(uri)
