@@ -1,6 +1,7 @@
 module RubyMCP
   class Server
     include Capabilities::Logging
+    include Capabilities::Prompts
 
     attr_reader :lifecycle, :prompts, :resources
 
@@ -21,17 +22,13 @@ module RubyMCP
       start_transport
     end
 
-    def add_prompt(...)
-      @prompts.add(...)
-    end
-
     def add_resource(...)
       @resources.add(...)
     end
 
     def send_message(message)
       RubyMCP.logger.debug "S -> C : #{message}"
-      @transport.send(message)
+      @transport.enqueue(message)
     end
 
     def answer(request, result)

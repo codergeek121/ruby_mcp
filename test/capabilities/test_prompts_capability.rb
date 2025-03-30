@@ -329,4 +329,43 @@ class TestPromptsCapability < ServerTest
       }
     )
   end
+
+  def test_adding_prompt_sends_prompts_list_changed
+    @server.add_prompt(
+      name: "refactor",
+      description: "Review this code",
+      arguments: [
+        {
+          name: "code",
+          description: "code to review",
+          required: true,
+          completions: ->(*) { [ "some", "completion", "value" ] }
+        },
+        {
+          name: "language",
+          description: "Programming language",
+          required: true,
+          completions: ->(*) { [ "some", "completion", "value" ] }
+        }
+      ],
+      result: ->() {
+        {
+          description: "demo",
+          messages: [
+            {
+              role: "user",
+              content: {
+                type: "text",
+                text: "demo"
+              }
+            }
+          ]
+        }
+      },
+    )
+
+    assert_last_response(
+      jsonrpc: "2.0", method: "notifications/prompts/list_changed"
+    )
+  end
 end
